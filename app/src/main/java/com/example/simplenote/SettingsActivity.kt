@@ -23,9 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextAlign
-import com.example.simplenote.ui.theme.Red
-import com.example.simplenote.ui.theme.Gray
-import com.example.simplenote.ui.theme.DarkGray
+import com.example.simplenote.ui.theme.*
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +65,7 @@ fun SettingsScreen(
             name = name,
             email = email
             )
-            HorizontalDivider(thickness = 1.dp, color = Gray)
+            HorizontalDivider(thickness = 1.dp, color = LightGray)
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -96,7 +94,7 @@ fun SettingsScreen(
                     onChangePassword
                     )
                 }
-                HorizontalDivider(thickness = 1.dp, color = Gray)
+                HorizontalDivider(thickness = 1.dp, color = LightGray)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,7 +116,15 @@ fun SettingsScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
-        Footer(versionText = "Taha Notes v1.1")
+        Text(
+            text = "Taha Notes v1.1",
+            fontSize = 12.sp,
+            color = Gray,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
+        )
     }
 }
 
@@ -142,19 +148,6 @@ fun ProfileSection(imageRes: Int, name: String, email: String) {
             AppLabel(email, AppIcons.Email, 12.sp, FontWeight(400), 15.dp, null, DarkGray)
         }
     }
-}
-
-@Composable
-fun Footer(versionText: String) {
-    Text(
-        text = versionText,
-        fontSize = 12.sp,
-        color = Color(0xFFCCCCCC),
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 40.dp)
-    )
 }
 
 @Preview(showBackground = true)

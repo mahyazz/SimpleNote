@@ -1,7 +1,7 @@
 package com.example.simplenote.ui.components
 
 import com.example.simplenote.ui.theme.AccentPurple
-import com.example.simplenote.ui.theme.Gray
+import com.example.simplenote.ui.theme.LightGray
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,5 +43,5 @@ fun TopBar(
             )
         }
     }
-    HorizontalDivider(thickness = 1.dp, color = Gray)
+    HorizontalDivider(thickness = 1.dp, color = LightGray)
 }
