@@ -1,7 +1,6 @@
 package com.example.simplenote.ui.components
 
-import com.example.simplenote.ui.theme.AccentPurple
-import com.example.simplenote.ui.theme.LightGray
+import com.example.simplenote.ui.theme.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +29,7 @@ fun TopBar(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AppLabel(backButtonText, AppIcons.ArrowLeft, 16.sp, FontWeight(500), 20.dp, onBack, AccentPurple)
+            AppLabel(backButtonText, AppIcons.ArrowLeft, 16.sp, FontWeight(500), 20.dp, onBack, Purple)
         }
 
         title?.let {
