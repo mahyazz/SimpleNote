@@ -78,7 +78,7 @@ fun ChangePasswordScreen(
             AppInput("RetypeNew Password", "********")
 
             Spacer(modifier = Modifier.weight(1f))
-            AppButton("Submit New Password", 16.dp, onSubmit, true)
+            AppButton("Submit New Password", 12.dp, onSubmit, true)
         }
     }
 }
