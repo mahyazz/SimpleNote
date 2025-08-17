@@ -22,4 +22,7 @@ object AppIcons {
 
     @DrawableRes
     val ArrowLeft = R.drawable.ic_arrow_left
+
+    @DrawableRes
+    val ArrowForward = R.drawable.ic_arrow_forward
 }

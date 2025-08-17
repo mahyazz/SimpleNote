@@ -78,24 +78,7 @@ fun ChangePasswordScreen(
             AppInput("RetypeNew Password", "********")
 
             Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = onSubmit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
-                shape = RoundedCornerShape(100.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Purple)
-            ) {
-                Text("Submit New Password", color = Color.White)
-                Spacer(Modifier.width(8.dp))
-                Image(
-                    painter = painterResource(id = AppIcons.ArrowRight),
-                    contentDescription = "Icon",
-                    modifier = Modifier
-                        .size(20.dp),
-                    colorFilter = ColorFilter.tint(Color.White)
-                )
-            }
+            AppButton("Submit New Password", 16.dp, onSubmit, true)
         }
     }
 }
