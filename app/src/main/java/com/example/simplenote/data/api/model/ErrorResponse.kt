@@ -1,6 +1,4 @@
-package com.example.simplenote.data.api.model.request
-
-import com.google.gson.annotations.SerializedName
+package com.example.simplenote.data.api.model
 
 class ErrorResponse {
     data class ErrorResponse(
