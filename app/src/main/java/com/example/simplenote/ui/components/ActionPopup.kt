@@ -32,7 +32,7 @@ fun ActionPopup(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(vertical = 24.dp, horizontal = 32.dp),
+                    .padding(vertical = 24.dp, horizontal = 40.dp),
                 verticalArrangement = Arrangement.spacedBy(48.dp)
             ) {
                 Column(

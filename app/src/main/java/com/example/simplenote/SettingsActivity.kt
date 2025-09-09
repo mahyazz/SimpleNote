@@ -1,5 +1,6 @@
 package com.example.simplenote
 
+import android.content.Intent
 import com.example.simplenote.ui.components.*
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -34,7 +35,10 @@ class SettingsActivity : ComponentActivity() {
                 name = "Taha Hamifar",
                 email = "hamifar.taha@gmail.com",
                 onBack = { /* Navigate back */ },
-                onChangePassword = { /* Navigate to Change Password */ },
+                onChangePassword = {
+                    val intent = Intent(this, ChangePasswordActivity::class.java)
+                    startActivity(intent)
+                },
                 onLogout = { /* Handle logout */ }
             )
         }
@@ -111,7 +115,7 @@ fun SettingsScreen(
                         16.sp,
                         FontWeight(500),
                         24.dp,
-                        onLogout,
+                        { showDialog = true },
                         Red
                     )
                 }

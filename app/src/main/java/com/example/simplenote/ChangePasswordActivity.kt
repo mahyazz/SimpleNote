@@ -75,7 +75,7 @@ fun ChangePasswordScreen(
             AppInput("New Password", "********", "Password should contain a-z, A-Z, 0-9.")
 
             Spacer(Modifier.width(8.dp))
-            AppInput("RetypeNew Password", "********")
+            AppInput("Retype New Password", "********")
 
             Spacer(modifier = Modifier.weight(1f))
             AppButton("Submit New Password", 12.dp, onSubmit, true)
