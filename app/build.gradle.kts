@@ -72,4 +72,5 @@ dependencies {
     testImplementation(libs.junit)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.security.crypto)
 }
