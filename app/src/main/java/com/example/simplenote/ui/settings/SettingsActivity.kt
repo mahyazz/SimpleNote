@@ -1,4 +1,4 @@
-package com.example.simplenote
+package com.example.simplenote.ui.settings
 
 import android.content.Intent
 import com.example.simplenote.ui.components.*
@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.simplenote.ui.theme.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.simplenote.ui.settings.changepassword.*
+import com.example.simplenote.R
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

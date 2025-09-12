@@ -25,4 +25,10 @@ object AppIcons {
 
     @DrawableRes
     val ArrowForward = R.drawable.ic_arrow_forward
+
+    @DrawableRes
+    val Visible = R.drawable.ic_visibility
+
+    @DrawableRes
+    val Invisible = R.drawable.ic_visibility_off
 }

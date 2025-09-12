@@ -1,7 +1,7 @@
 package com.example.simplenote.domain.model
 
-sealed class Result<out T> {
-    data class Success<out T>(val data: T) : Result<T>()
-    data class Error(val exception: Exception) : Result<Nothing>()
-    object Loading : Result<Nothing>()
-}
+data class Result<T>(
+    val success: Boolean,
+    val message: String,
+    val data: T? = null
+)
