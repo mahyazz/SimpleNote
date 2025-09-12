@@ -73,7 +73,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(apiService: ApiService): AuthRepository {
-        return AuthRepositoryImpl(apiService)
+    fun provideAuthRepository(apiService: ApiService, prefs: EncryptedSharedPreferences): AuthRepository {
+        return AuthRepositoryImpl(apiService, prefs)
     }
 }

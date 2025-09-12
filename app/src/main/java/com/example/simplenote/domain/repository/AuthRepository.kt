@@ -4,4 +4,5 @@ import com.example.simplenote.domain.model.Result
 
 interface AuthRepository {
     suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit>
+    suspend fun logout()
 }

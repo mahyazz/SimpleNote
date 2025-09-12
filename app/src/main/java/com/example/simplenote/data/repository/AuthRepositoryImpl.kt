@@ -1,5 +1,6 @@
 package com.example.simplenote.data.repository
 
+import androidx.security.crypto.EncryptedSharedPreferences
 import com.example.simplenote.domain.model.Result
 import com.example.simplenote.domain.repository.AuthRepository
 import com.example.simplenote.data.api.*
@@ -8,7 +9,8 @@ import javax.inject.Inject
 import java.io.IOException
 
 class AuthRepositoryImpl @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val encryptedPrefs: EncryptedSharedPreferences
 ) : AuthRepository {
 
     override suspend fun changePassword(
@@ -40,5 +42,9 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result(success = false, message = "An unexpected error occurred.")
         }
+    }
+
+    override suspend fun logout() {
+        encryptedPrefs.edit().remove("token_key").apply()
     }
 }
