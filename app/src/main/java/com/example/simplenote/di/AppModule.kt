@@ -16,6 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 import android.app.Application
+import dagger.Binds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -76,4 +77,7 @@ object AppModule {
     fun provideAuthRepository(apiService: ApiService, prefs: EncryptedSharedPreferences): AuthRepository {
         return AuthRepositoryImpl(apiService, prefs)
     }
+
+
+
 }

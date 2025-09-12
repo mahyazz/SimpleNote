@@ -3,10 +3,15 @@ package com.example.simplenote.data.repository
 import androidx.security.crypto.EncryptedSharedPreferences
 import com.example.simplenote.domain.model.Result
 import com.example.simplenote.domain.repository.AuthRepository
-import com.example.simplenote.data.api.*
 import com.example.simplenote.data.api.model.ChangePasswordRequest
+
 import javax.inject.Inject
 import java.io.IOException
+import com.example.simplenote.data.api.model.RegisterRequest
+import com.example.simplenote.data.api.model.RegisterResponse
+import retrofit2.Response
+import com.example.simplenote.data.api.ApiService
+
 
 class AuthRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
@@ -47,4 +52,9 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun logout() {
         encryptedPrefs.edit().remove("token_key").apply()
     }
+    override suspend fun register(request: RegisterRequest): Response<RegisterResponse> {
+        return apiService.register(request)
+    }
+
+
 }

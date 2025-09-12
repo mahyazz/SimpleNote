@@ -11,7 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.simplenote.ui.settings.SettingsActivity
+import com.example.simplenote.ui.auth.register.RegisterActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,8 +22,10 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 MainScreen(
                     onOpenSettings = {
-                        val intent = Intent(this, SettingsActivity::class.java)
-                        startActivity(intent)
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                    },
+                    onOpenRegister = {
+                        startActivity(Intent(this, RegisterActivity::class.java))
                     }
                 )
             }
@@ -30,13 +34,22 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(onOpenSettings: () -> Unit) {
+fun MainScreen(
+    onOpenSettings: () -> Unit,
+    onOpenRegister: () -> Unit
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Button(onClick = onOpenSettings) {
-            Text("Go to Settings")
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Button(onClick = onOpenSettings) {
+                Text("Go to Settings")
+            }
+            Spacer(Modifier.height(12.dp))
+            Button(onClick = onOpenRegister) {
+                Text("Go to Register")
+            }
         }
     }
 }
