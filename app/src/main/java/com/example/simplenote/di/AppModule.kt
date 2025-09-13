@@ -78,8 +78,11 @@ object AppModule {
         }
 
         val logging = HttpLoggingInterceptor().apply {
+            // Avoid logging full bodies to protect user data; BASIC logs method/URL/status only
             level = if (com.example.simplenote.BuildConfig.DEBUG)
-                HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+                HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+            // Redact sensitive headers
+            redactHeader("Authorization")
         }
 
         return OkHttpClient.Builder()

@@ -2,6 +2,7 @@ package com.example.simplenote.ui.auth.login
 
 import android.content.Intent
 import android.widget.Toast
+import com.example.simplenote.ui.util.UserMessages
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -88,7 +89,8 @@ fun LoginScreen(
                 }
                 is LoginUiState.Error -> {
                     LaunchedEffect(uiState) {
-                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                        val msg = UserMessages.friendlyError(uiState.message)
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     }
                     AppButton(
                         text = "Register",
@@ -99,7 +101,8 @@ fun LoginScreen(
                 }
                 is LoginUiState.Success -> {
                     LaunchedEffect(uiState) {
-                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                        val msg = UserMessages.friendlySuccess(uiState.message, fallback = "Logged in successfully.")
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     }
                 }
                 LoginUiState.Idle -> {

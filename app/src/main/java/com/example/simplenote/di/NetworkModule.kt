@@ -30,10 +30,12 @@ object NetworkModule {
     @Provides @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor =
         HttpLoggingInterceptor().apply {
+            // Use BASIC in debug to avoid dumping full request/response bodies in logs
             level = if (com.example.simplenote.BuildConfig.DEBUG)
-                HttpLoggingInterceptor.Level.BODY
+                HttpLoggingInterceptor.Level.BASIC
             else
                 HttpLoggingInterceptor.Level.NONE
+            redactHeader("Authorization")
         }
 
 

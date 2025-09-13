@@ -3,6 +3,7 @@ package com.example.simplenote.ui.settings
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import com.example.simplenote.ui.util.UserMessages
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,7 +36,8 @@ class SettingsActivity : ComponentActivity() {
                             finishAffinity()
                         },
                         onError = { msg ->
-                            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                            val pretty = UserMessages.friendlyError(msg)
+                            Toast.makeText(this, pretty, Toast.LENGTH_SHORT).show()
                         }
                     )
                 }
