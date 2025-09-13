@@ -40,6 +40,7 @@ class RegisterViewModel @Inject constructor(
             when (val res = authRepo.register(username, password, email, firstName, lastName, _scheme.value)) {
                 is AuthResult.Success -> {
                     _message.value = res.message ?: "Registration successfull. Please login."
+                    _success.value = true
                 }
                 is AuthResult.Error -> {
                     _message.value = res.message

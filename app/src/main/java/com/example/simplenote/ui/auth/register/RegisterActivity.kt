@@ -60,7 +60,7 @@ class RegisterActivity : ComponentActivity() {
                 onEmailChange = { email = it },
                 onBack = {finish()},
                 onSubmit =  {
-                    viewModel.register(firstName, lastName, username, password, email)
+                    viewModel.register(username, password, email, firstName, lastName)
                 }
             )
         }
