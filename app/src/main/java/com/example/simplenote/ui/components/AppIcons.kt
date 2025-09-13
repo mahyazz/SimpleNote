@@ -31,4 +31,13 @@ object AppIcons {
 
     @DrawableRes
     val Invisible = R.drawable.ic_visibility_off
+
+    @DrawableRes
+    val Home = R.drawable.ic_home
+
+    @DrawableRes
+    val Add = R.drawable.ic_add
+
+    @DrawableRes
+    val Settings = R.drawable.ic_settings
 }
