@@ -200,7 +200,6 @@ class NotesViewModel @Inject constructor(
         is retrofit2.HttpException -> "Server error: ${code()} ${message()}"
         is java.net.UnknownHostException -> "اتصال اینترنت برقرار نیست."
         is java.net.SocketTimeoutException -> "درخواست زمان‌بر شد."
-        is java.time.format.DateTimeParseException -> "خطا در پارس تاریخ."
         else -> localizedMessage ?: "خطای ناشناخته"
     }
 
