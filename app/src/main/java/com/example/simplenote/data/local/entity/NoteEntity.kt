@@ -14,3 +14,10 @@ data class NoteEntity(
     val isDeleted: Boolean = false,    // حذف نرم (برای push بعدی)
     val dirty: Boolean = false         // نیاز به sync
 )
+
+@Entity(tableName = "note_remote_keys")
+data class NoteRemoteKeys(
+    @PrimaryKey val noteId: String, // local id (UUID)
+    val prevKey: Int?,              // شماره صفحه قبلی
+    val nextKey: Int?               // شماره صفحه بعدی
+)

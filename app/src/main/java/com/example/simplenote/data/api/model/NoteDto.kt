@@ -1,6 +1,8 @@
 package com.example.simplenote.data.api.model
 
 import com.google.gson.annotations.SerializedName
+import retrofit2.http.Query
+
 
 data class NoteDto(
     @SerializedName("id") val id: Int?,
@@ -10,6 +12,9 @@ data class NoteDto(
     @SerializedName("updated_at") val updatedAt: String?,  // ISO8601
     @SerializedName("creator_name") val creatorName: String? = null,
     @SerializedName("creator_username") val creatorUsername: String? = null
+
+
+
 )
 
 data class NoteCreateUpdateBody(

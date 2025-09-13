@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.simplenote.domain.model.Note
 import com.example.simplenote.domain.repository.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -18,13 +17,58 @@ import javax.inject.Inject
 import javax.net.ssl.HttpsURLConnection
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.paging.ExperimentalPagingApi
 import androidx.security.crypto.EncryptedSharedPreferences
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+import com.example.simplenote.domain.model.NoteInput
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.flatMapLatest
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+
+
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
+
+
     private val repo: NoteRepository,
-    private val prefs: EncryptedSharedPreferences
+    private val prefs: EncryptedSharedPreferences,
+
 ) : ViewModel() {
+
+
+    private val _filter = kotlinx.coroutines.flow.MutableStateFlow<com.example.simplenote.domain.model.NoteFilter?>(null)
+    val filter = _filter.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val paged: Flow<PagingData<Note>> =
+        filter.flatMapLatest { f ->
+            if (f == null) repo.pagedNotes()
+            else repo.pagedNotesFiltered(f)
+        }.cachedIn(viewModelScope)
+
+
+
+    fun setFilter(f: com.example.simplenote.domain.model.NoteFilter?) {
+        _filter.value = f
+    }
+
+    private val _busy = MutableStateFlow(false)
+    val busy: StateFlow<Boolean> = _busy.asStateFlow()
+
+    private val _snackbar = MutableStateFlow<String?>(null)
+    val snackbar: StateFlow<String?> = _snackbar.asStateFlow()
 
     companion object {
         private const val TOKEN_KEY = "access_token"
@@ -158,5 +202,28 @@ class NotesViewModel @Inject constructor(
         is java.net.SocketTimeoutException -> "درخواست زمان‌بر شد."
         is java.time.format.DateTimeParseException -> "خطا در پارس تاریخ."
         else -> localizedMessage ?: "خطای ناشناخته"
+    }
+
+    fun addRemote(title: String, description: String) = viewModelScope.launch {
+        try {
+            isBusy.value = true
+            withContext(Dispatchers.IO) { repo.createRemote(title, description) }
+            snackbarMessage.value = "Created on server"
+        } catch (t: Throwable) {
+            snackbarMessage.value = t.message ?: "Failed"
+        } finally {
+            isBusy.value = false
+        }
+    }
+
+    fun addBulk(items: List<NoteInput>) = viewModelScope.launch {
+
+
+        val ok = runCatching {
+            withContext(Dispatchers.IO) { repo.bulkCreateRemote(items) }
+        }.isSuccess
+        if (!ok) {
+            withContext(Dispatchers.IO) { repo.bulkCreateLocal(items) }
+        }
     }
 }

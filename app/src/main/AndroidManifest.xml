@@ -20,6 +20,9 @@
         <activity android:name=".ui.auth.register.RegisterActivity" />
         <activity android:name=".ui.auth.login.LoginActivity" />
         <activity android:name=".ui.auth.OnboardingActivity" />
+        <activity android:name=".ui.notes.add.AddNoteActivity" />
+        <activity android:name=".ui.notes.detail.NoteDetailActivity" />
+        <activity android:name=".ui.notes.edit.EditNoteActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
