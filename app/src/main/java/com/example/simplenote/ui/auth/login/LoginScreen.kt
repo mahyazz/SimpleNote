@@ -37,8 +37,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-            .verticalScroll(rememberScrollState()),
+            .background(Color.White),
         verticalArrangement = Arrangement.Center
     ) {
         Column(
@@ -92,8 +91,6 @@ fun LoginScreen(
                 onValueChange = onPasswordChange,
                 isPassword = true
             )
-
-            Spacer(modifier = Modifier.weight(1f))
 
             when (uiState) {
                 RegisterUiState.Loading -> {

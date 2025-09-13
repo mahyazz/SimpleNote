@@ -24,11 +24,12 @@ fun AppButton (
     hasIcon: Boolean,
     type: String = "Filled",
 ) {
-    val buttonColors = if (type == "Filled") {
-        ButtonDefaults.buttonColors(containerColor = Purple)
-    } else {
-        ButtonDefaults.outlinedButtonColors()
+    val buttonColors = when (type) {
+        "Alt" -> ButtonDefaults.buttonColors(containerColor = Color.White)
+        "Outlined" -> ButtonDefaults.outlinedButtonColors()
+        else -> ButtonDefaults.buttonColors(containerColor = Purple)
     }
+
     val border = if (type == "Outlined") BorderStroke(2.dp, Purple) else null
     val contentColor = if (type == "Filled") Color.White else Purple
 
