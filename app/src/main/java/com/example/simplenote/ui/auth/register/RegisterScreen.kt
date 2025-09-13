@@ -1,5 +1,6 @@
 package com.example.simplenote.ui.auth.register
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -35,8 +36,7 @@ fun RegisterScreen(
     retypePassword: String,
     onRetypePasswordChange: (String) -> Unit,
     onBack: () -> Unit,
-    onSubmit: () -> Unit,
-    onLoginClick: () -> Unit
+    onSubmit: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -52,7 +52,7 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -156,11 +156,14 @@ fun RegisterScreen(
             }
 
             TextButton(
-                onClick = onLoginClick,
+                onClick = {
+//                    val intent = Intent(context, LoginActivity::class.java)
+//                    context.startActivity(intent)
+                },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = "Already have an account? Login here",
+                    text = "Already have an account? Login here.",
                     color = Purple,
                     fontSize = 16.sp
                 )
@@ -194,7 +197,6 @@ fun RegisterScreenPreview() {
         retypePassword = retype,
         onRetypePasswordChange = { retype = it },
         onBack = {},
-        onSubmit = {},
-        onLoginClick = {}
+        onSubmit = {}
     )
 }
