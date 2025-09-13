@@ -8,5 +8,6 @@ import retrofit2.Response
 
 interface AuthRepository {
     suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit>
+    suspend fun logout()
     suspend fun register(request: RegisterRequest): Response<RegisterResponse>
 }
