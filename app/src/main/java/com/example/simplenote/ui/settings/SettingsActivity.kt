@@ -70,7 +70,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ){
             ProfileSection(
-            imageRes = R.drawable.ic_pfp,
+            imageRes = R.drawable.ic_pfp_taha,
             name = name,
             email = email
             )
