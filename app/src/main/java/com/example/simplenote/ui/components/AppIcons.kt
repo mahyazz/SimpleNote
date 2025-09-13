@@ -15,7 +15,7 @@ object AppIcons {
     val Email = R.drawable.ic_email
 
     @DrawableRes
-    val Profile = R.drawable.ic_pfp_taha
+    val Profile = R.drawable.ic_pfp
 
     @DrawableRes
     val ArrowRight = R.drawable.ic_arrow_right
