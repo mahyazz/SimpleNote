@@ -1,13 +1,14 @@
 package com.example.simplenote.ui.auth.register
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.example.simplenote.ui.auth.login.LoginActivity
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,12 +37,12 @@ class RegisterActivity : ComponentActivity() {
                 else -> RegisterUiState.Idle
             }
 
-            var firstName = ""
-            var lastName = ""
-            var username = ""
-            var password = ""
-            var retypePassword = ""
-            var email = ""
+            var firstName by remember { mutableStateOf("") }
+            var lastName by remember { mutableStateOf("") }
+            var username by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
+            var retypePassword by remember { mutableStateOf("") }
+            var email by remember { mutableStateOf("") }
 
             RegisterScreen(
                 uiState = uiState,

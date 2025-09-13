@@ -6,6 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,8 +37,8 @@ class LoginActivity : ComponentActivity() {
                 else -> LoginUiState.Idle
             }
 
-            var username = ""
-            var password = ""
+            var username by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
 
             LoginScreen(
                 uiState = uiState,

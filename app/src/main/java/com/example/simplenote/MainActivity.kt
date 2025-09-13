@@ -12,6 +12,8 @@ import com.example.simplenote.ui.auth.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.example.simplenote.domain.repository.AuthRepository
+import com.example.simplenote.ui.auth.OnboardingActivity
+import com.example.simplenote.ui.auth.OnboardingScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -21,12 +23,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // اگر لاگین نیست → بفرست به Login و همین Activity رو ببند
         if (!authRepo.isLoggedIn()) {
-            startActivity(Intent(this, LoginActivity::class.java))
+            startActivity(Intent(this, OnboardingActivity::class.java))
             finish()
             return
-            //just check
         }
 
         setContent {

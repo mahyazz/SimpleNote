@@ -19,6 +19,7 @@
         <activity android:name=".ui.settings.SettingsActivity" />
         <activity android:name=".ui.auth.register.RegisterActivity" />
         <activity android:name=".ui.auth.login.LoginActivity" />
+        <activity android:name=".ui.auth.OnboardingActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
