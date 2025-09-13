@@ -31,7 +31,7 @@ object AppModule {
     private const val PREFS_NAME = "secure_prefs"
     private const val KEY_ACCESS  = "access_token"
     private const val KEY_REFRESH = "refresh_token"
-    private const val KEY_SCHEME  = "auth_scheme" // "Bearer" یا "JWT"
+    private const val KEY_SCHEME  = "auth_scheme" // "Bearer" or "JWT"
 
     @Provides @Singleton
     fun provideEncryptedPrefs(@ApplicationContext ctx: Context): EncryptedSharedPreferences {

@@ -50,7 +50,7 @@ class AuthRepositoryImpl @Inject constructor(
         try {
             val r = api.createToken(TokenRequest(username, password))
             saveTokens(r.access, r.refresh, scheme)
-            AuthResult.Success("ورود موفق")
+            AuthResult.Success("Login successful")
         } catch (e: HttpException) {
             AuthResult.Error(httpErrorMessage(e))
         } catch (t: Throwable) {
@@ -63,12 +63,12 @@ class AuthRepositoryImpl @Inject constructor(
         email: String,
         firstName: String?,
         lastName: String?,
-        scheme: String // فعلاً نادیده می‌گیریم؛ بعد از ثبت‌نام لاگین انجام نمی‌شود
+        scheme: String // Ignored for now; we do not auto-login after registration
     ): AuthResult {
         return try {
             api.register(RegisterRequest(username, password, email, firstName, lastName))
-            // توجه: لاگین خودکار و saveTokens حذف شد
-            AuthResult.Success("ثبت‌نام موفق. لطفاً وارد شوید.")
+            // Note: Auto-login and saveTokens removed
+            AuthResult.Success("Registration successful. Please log in.")
         } catch (e: HttpException) {
             AuthResult.Error(httpErrorMessage(e))
         } catch (t: Throwable) {
