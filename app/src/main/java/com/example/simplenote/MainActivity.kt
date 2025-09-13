@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
+            //just check
         }
 
         setContent {
