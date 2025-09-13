@@ -1,131 +1,181 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
-
 package com.example.simplenote.ui.auth.login
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import android.content.Intent
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.simplenote.ui.components.*
+import com.example.simplenote.ui.theme.*
+import com.example.simplenote.ui.auth.register.*
 
 @Composable
-fun LoginRoute(
-    onDone: () -> Unit,
-    onOpenRegister: () -> Unit,
-    vm: LoginViewModel
+fun LoginScreen(
+    uiState: RegisterUiState,
+    username: String,
+    onUsernameChange: (String) -> Unit,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    onSubmit: () -> Unit
 ) {
-    val busy    by vm.busy.collectAsState()
-    val msg     by vm.message.collectAsState()
-    val success by vm.success.collectAsState()
-    val scheme  by vm.scheme.collectAsState()
+    val context = LocalContext.current
 
-    val snackbar = remember { SnackbarHostState() }
-    LaunchedEffect(msg)     { msg?.let { snackbar.showSnackbar(it) } }
-    LaunchedEffect(success) { if (success) onDone() }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Login") },
-                actions = { TextButton(onClick = onOpenRegister) { Text("Register") } }
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbar) }
-    ) { padding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center
+    ) {
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            LoginForm(
-                busy = busy,
-                currentScheme = scheme,
-                onSchemeChange = vm::updateScheme,
-                onSubmit = { u, p -> vm.login(u, p) },
-                onOpenRegister = onOpenRegister // ← اینجا پاس می‌دهیم
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Let's Login",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Text(
+                    text = "And note your ideas",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            AppInput(
+                label = "Username",
+                placeholder = "Example: @HamifarTaha",
+                value = username,
+                onValueChange = onUsernameChange
             )
 
-            if (!msg.isNullOrBlank()) {
+            AppInput(
+                label = "Email Address",
+                placeholder = "Example: hamifar.taha@gmail.com",
+                value = email,
+                onValueChange = onEmailChange
+            )
+
+            AppInput(
+                label = "Password",
+                placeholder = "********",
+                value = password,
+                onValueChange = onPasswordChange,
+                isPassword = true
+            )
+
+            when (uiState) {
+                RegisterUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
+                is RegisterUiState.Error -> {
+                    LaunchedEffect(uiState) {
+                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                    }
+                    AppButton(
+                        text = "Register",
+                        padding = 12.dp,
+                        onClick = onSubmit,
+                        hasIcon = true
+                    )
+                }
+                is RegisterUiState.Success -> {
+                    LaunchedEffect(uiState) {
+//                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                RegisterUiState.Idle -> {
+                    AppButton(
+                        text = "Login",
+                        padding = 12.dp,
+                        onClick = onSubmit,
+                        hasIcon = true
+                    )
+                }
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = Gray,
+                    modifier = Modifier.weight(1f)
+                )
                 Text(
-                    text = msg!!,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "or",
+                    color = DarkGray
+                )
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = Gray,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+
+            TextButton(
+                onClick = {
+                    val intent = Intent(context, RegisterActivity::class.java)
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "Don't have an account? Register here.",
+                    color = Purple,
+                    fontSize = 16.sp
                 )
             }
         }
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-private fun LoginForm(
-    busy: Boolean,
-    currentScheme: String,
-    onSchemeChange: (String) -> Unit,
-    onSubmit: (String, String) -> Unit,
-    onOpenRegister: () -> Unit // ← پارامتر اضافه شد
-) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
+fun LoginScreenPreview() {
+    var user by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var pass by remember { mutableStateOf("") }
 
-    if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
-
-    OutlinedTextField(
-        value = username, onValueChange = { username = it },
-        label = { Text("Username") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+    LoginScreen(
+        uiState = RegisterUiState.Idle,
+        username = user,
+        onUsernameChange = { user = it },
+        email = email,
+        onEmailChange = { email = it },
+        password = pass,
+        onPasswordChange = { pass = it },
+        onSubmit = {}
     )
-    OutlinedTextField(
-        value = password, onValueChange = { password = it },
-        label = { Text("Password") }, singleLine = true,
-        visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth()
-    )
-
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-        OutlinedTextField(
-            value = currentScheme, onValueChange = {},
-            label = { Text("Auth Scheme") }, readOnly = true,
-            modifier = Modifier
-                .menuAnchor() // نسخه قدیمی (سازگار با متریال فعلی پروژه)
-                .fillMaxWidth()
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            DropdownMenuItem(text = { Text("JWT") }, onClick = { onSchemeChange("JWT");  expanded = false })
-            DropdownMenuItem(text = { Text("Bearer") }, onClick = { onSchemeChange("Bearer"); expanded = false })
-        }
-    }
-
-    Button(
-        onClick = { onSubmit(username.trim(), password) },
-        enabled = !busy && username.isNotBlank() && password.isNotBlank()
-    ) { Text("Login") }
-
-    // دکمهٔ ثبت‌نام برای کاربرانی که اکانت ندارند
-    TextButton(onClick = onOpenRegister) {
-        Text("حساب ندارید؟ ثبت‌نام کنید")
-    }
 }

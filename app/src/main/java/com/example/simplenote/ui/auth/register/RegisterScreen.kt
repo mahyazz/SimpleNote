@@ -1,102 +1,201 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
-
 package com.example.simplenote.ui.auth.register
 
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.simplenote.ui.components.*
+import com.example.simplenote.ui.theme.*
 
 @Composable
-fun RegisterRoute(
-    onDone: () -> Unit,
-    vm: RegisterViewModel
+fun RegisterScreen(
+    uiState: RegisterUiState,
+    firstName: String,
+    onFirstNameChange: (String) -> Unit,
+    lastName: String,
+    onLastNameChange: (String) -> Unit,
+    username: String,
+    onUsernameChange: (String) -> Unit,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    retypePassword: String,
+    onRetypePasswordChange: (String) -> Unit,
+    onBack: () -> Unit,
+    onSubmit: () -> Unit
 ) {
-    val busy    by vm.busy.collectAsState()
-    val msg     by vm.message.collectAsState()
-    val success by vm.success.collectAsState()
-    val scheme  by vm.scheme.collectAsState()
+    val context = LocalContext.current
 
-    val snackbar = remember { SnackbarHostState() }
-    LaunchedEffect(msg) { msg?.let { snackbar.showSnackbar(it) } }
-    LaunchedEffect(success) { if (success) onDone() }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .verticalScroll(rememberScrollState())
+    ) {
+        TopBar(backButtonText = "Back to Login", onBack = onBack)
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Register") }) },
-        snackbarHost = { SnackbarHost(snackbar) }
-    ) { padding ->
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            RegisterForm(
-                busy = busy,
-                currentScheme = scheme,
-                onSchemeChange = vm::updateScheme,
-                onSubmit = { u, p, e, f, l -> vm.register(u, p, e, f, l) }
-            )
-            if (!msg.isNullOrBlank()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 Text(
-                    text = msg!!,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "Register",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Text(
+                    text = "And start taking notes",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            AppInput(
+                label = "First Name",
+                placeholder = "Example: Taha",
+                value = firstName,
+                onValueChange = onFirstNameChange
+            )
+
+            AppInput(
+                label = "Last Name",
+                placeholder = "Example: Hamifar",
+                value = lastName,
+                onValueChange = onLastNameChange
+            )
+
+            AppInput(
+                label = "Username",
+                placeholder = "Example: @HamifarTaha",
+                value = username,
+                onValueChange = onUsernameChange
+            )
+
+            AppInput(
+                label = "Email Address",
+                placeholder = "Example: hamifar.taha@gmail.com",
+                value = email,
+                onValueChange = onEmailChange
+            )
+
+            AppInput(
+                label = "Password",
+                placeholder = "********",
+                value = password,
+                onValueChange = onPasswordChange,
+                isPassword = true
+            )
+
+            AppInput(
+                label = "Retype Password",
+                placeholder = "********",
+                value = retypePassword,
+                onValueChange = onRetypePasswordChange,
+                isPassword = true
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            when (uiState) {
+                RegisterUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
+                is RegisterUiState.Error -> {
+                    LaunchedEffect(uiState) {
+                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                    }
+                    AppButton(
+                        text = "Register",
+                        padding = 12.dp,
+                        onClick = onSubmit,
+                        hasIcon = true
+                    )
+                }
+                is RegisterUiState.Success -> {
+                    LaunchedEffect(uiState) {
+//                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                        onBack()
+                    }
+                }
+                RegisterUiState.Idle -> {
+                    AppButton(
+                        text = "Register",
+                        padding = 12.dp,
+                        onClick = onSubmit,
+                        hasIcon = true
+                    )
+                }
+            }
+
+            TextButton(
+                onClick = {
+//                    val intent = Intent(context, LoginActivity::class.java)
+//                    context.startActivity(intent)
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "Already have an account? Login here.",
+                    color = Purple,
+                    fontSize = 16.sp
                 )
             }
         }
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-private fun RegisterForm(
-    busy: Boolean,
-    currentScheme: String,
-    onSchemeChange: (String) -> Unit,
-    onSubmit: (String, String, String, String?, String?) -> Unit // ← فیکس: فلش و Unit
-) {
-    var username by remember { mutableStateOf("") }
-    var email    by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var first    by remember { mutableStateOf("") }
-    var last     by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
+fun RegisterScreenPreview() {
+    var first by remember { mutableStateOf("") }
+    var last by remember { mutableStateOf("") }
+    var user by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var pass by remember { mutableStateOf("") }
+    var retype by remember { mutableStateOf("") }
 
-    if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
-
-    OutlinedTextField(value = username, onValueChange = { username = it }, label = { Text("Username") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-    OutlinedTextField(value = email,    onValueChange = { email = it },       label = { Text("Email")    }, singleLine = true, modifier = Modifier.fillMaxWidth())
-    OutlinedTextField(value = password, onValueChange = { password = it },    label = { Text("Password") }, singleLine = true, modifier = Modifier.fillMaxWidth(), visualTransformation = PasswordVisualTransformation())
-    OutlinedTextField(value = first,    onValueChange = { first = it },       label = { Text("First name (optional)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-    OutlinedTextField(value = last,     onValueChange = { last = it },        label = { Text("Last name (optional)")  }, singleLine = true, modifier = Modifier.fillMaxWidth())
-
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-        OutlinedTextField(
-            value = currentScheme, onValueChange = {},
-            label = { Text("Auth Scheme") }, readOnly = true,
-            modifier = Modifier
-                .menuAnchor() // نسخه قدیمی (سازگار با متریال فعلی پروژه‌ات)
-                .fillMaxWidth()
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            DropdownMenuItem(text = { Text("JWT") }, onClick = { onSchemeChange("JWT");  expanded = false })
-            DropdownMenuItem(text = { Text("Bearer") }, onClick = { onSchemeChange("Bearer"); expanded = false })
-        }
-    }
-
-    Button(
-        onClick = {
-            onSubmit(
-                username.trim(),
-                password,
-                email.trim(),
-                first.ifBlank { null },
-                last.ifBlank  { null }
-            )
-        },
-        enabled = !busy && username.isNotBlank() && password.isNotBlank() && email.isNotBlank()
-    ) { Text("Register") }
+    RegisterScreen(
+        uiState = RegisterUiState.Idle,
+        firstName = first,
+        onFirstNameChange = { first = it },
+        lastName = last,
+        onLastNameChange = { last = it },
+        username = user,
+        onUsernameChange = { user = it },
+        email = email,
+        onEmailChange = { email = it },
+        password = pass,
+        onPasswordChange = { pass = it },
+        retypePassword = retype,
+        onRetypePasswordChange = { retype = it },
+        onBack = {},
+        onSubmit = {}
+    )
 }
