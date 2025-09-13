@@ -23,21 +23,20 @@ class LoginViewModel @Inject constructor(
     private val _success = MutableStateFlow(false)
     val success: StateFlow<Boolean> = _success.asStateFlow()
 
-    private val _scheme = MutableStateFlow(authRepo.currentScheme()) // پیش‌فرض: Bearer
+    private val _scheme = MutableStateFlow(authRepo.currentScheme())
     val scheme: StateFlow<String> = _scheme.asStateFlow()
 
     fun updateScheme(s: String) { _scheme.value = s; authRepo.setScheme(s) }
 
     fun login(username: String, password: String) = viewModelScope.launch {
         _busy.value = true
-        _message.value = "در حال ورود..."
+        _message.value = "Logging in..."
         when (val res = authRepo.login(username, password, _scheme.value)) {
             is AuthResult.Success -> {
-                // تست سبک userinfo برای پیام زیبا
                 val ui = authRepo.userInfo()
                 _message.value = ui.fold(
-                    onSuccess = { "ورود موفق. خوش آمدی ${it.username}" },
-                    onFailure = { "ورود موفق، اما userinfo خطا داد." }
+                    onSuccess = { "Welcome ${it.username}." },
+                    onFailure = { "Successful login." }
                 )
                 _success.value = true
             }

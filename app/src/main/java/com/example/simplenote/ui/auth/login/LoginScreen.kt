@@ -4,8 +4,6 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,15 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.simplenote.ui.components.*
 import com.example.simplenote.ui.theme.*
+import com.example.simplenote.ui.auth.login.LoginActivity.LoginUiState
 import com.example.simplenote.ui.auth.register.*
 
 @Composable
 fun LoginScreen(
-    uiState: RegisterUiState,
+    uiState: LoginUiState,
     username: String,
     onUsernameChange: (String) -> Unit,
-    email: String,
-    onEmailChange: (String) -> Unit,
     password: String,
     onPasswordChange: (String) -> Unit,
     onSubmit: () -> Unit
@@ -78,13 +75,6 @@ fun LoginScreen(
             )
 
             AppInput(
-                label = "Email Address",
-                placeholder = "Example: hamifar.taha@gmail.com",
-                value = email,
-                onValueChange = onEmailChange
-            )
-
-            AppInput(
                 label = "Password",
                 placeholder = "********",
                 value = password,
@@ -93,10 +83,10 @@ fun LoginScreen(
             )
 
             when (uiState) {
-                RegisterUiState.Loading -> {
+                LoginUiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
-                is RegisterUiState.Error -> {
+                is LoginUiState.Error -> {
                     LaunchedEffect(uiState) {
                         Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
                     }
@@ -107,12 +97,12 @@ fun LoginScreen(
                         hasIcon = true
                     )
                 }
-                is RegisterUiState.Success -> {
+                is LoginUiState.Success -> {
                     LaunchedEffect(uiState) {
-//                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
                     }
                 }
-                RegisterUiState.Idle -> {
+                LoginUiState.Idle -> {
                     AppButton(
                         text = "Login",
                         padding = 12.dp,
@@ -169,11 +159,9 @@ fun LoginScreenPreview() {
     var pass by remember { mutableStateOf("") }
 
     LoginScreen(
-        uiState = RegisterUiState.Idle,
+        uiState = LoginUiState.Idle,
         username = user,
         onUsernameChange = { user = it },
-        email = email,
-        onEmailChange = { email = it },
         password = pass,
         onPasswordChange = { pass = it },
         onSubmit = {}
