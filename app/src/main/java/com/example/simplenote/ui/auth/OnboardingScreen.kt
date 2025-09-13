@@ -1,5 +1,6 @@
 package com.example.simplenote.ui.auth
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.example.simplenote.R
 import com.example.simplenote.ui.components.*
 import com.example.simplenote.ui.theme.*
+import com.example.simplenote.ui.auth.login.LoginActivity
 
 @Composable
 fun OnboardingScreen(
@@ -58,8 +60,8 @@ fun OnboardingScreen(
                 text = "Let’s Get Started",
                 padding = 12.dp,
                 onClick = {
-//                    val intent = Intent(context, LoginActivity::class.java)
-//                    context.startActivity(intent)
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context.startActivity(intent)
                 },
                 hasIcon = true,
                 type = "Alt"

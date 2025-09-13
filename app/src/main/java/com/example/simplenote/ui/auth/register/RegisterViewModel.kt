@@ -36,11 +36,10 @@ class RegisterViewModel @Inject constructor(
     fun register(username: String, password: String, email: String, firstName: String?, lastName: String?) =
         viewModelScope.launch {
             _busy.value = true
-            _message.value = "در حال ایجاد حساب..."
+            _message.value = "Registering..."
             when (val res = authRepo.register(username, password, email, firstName, lastName, _scheme.value)) {
                 is AuthResult.Success -> {
-                    _message.value = res.message ?: "ثبت‌نام موفق. لطفاً وارد شوید."
-                    _success.value = true   // ← به Login می‌رویم (نه Main)
+                    _message.value = res.message ?: "Registration successfull. Please login."
                 }
                 is AuthResult.Error -> {
                     _message.value = res.message

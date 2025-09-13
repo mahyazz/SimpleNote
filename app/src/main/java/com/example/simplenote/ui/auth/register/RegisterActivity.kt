@@ -4,23 +4,63 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.example.simplenote.ui.auth.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class RegisterActivity : ComponentActivity() {
+
+    private val viewModel: RegisterViewModel by viewModels()
+
+    sealed class RegisterUiState {
+        object Idle : RegisterUiState()
+        object Loading : RegisterUiState()
+        data class Success(val message: String) : RegisterUiState()
+        data class Error(val message: String) : RegisterUiState()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val vm: RegisterViewModel = hiltViewModel()
-            RegisterRoute(
-                onDone = {
-                    // بعد از ثبت‌نام موفق → برو به صفحه لاگین
-                    startActivity(Intent(this, LoginActivity::class.java))
-                    finish()
-                },
-                vm = vm
+            val busy by viewModel.busy.collectAsState()
+            val message by viewModel.message.collectAsState()
+            val success by viewModel.success.collectAsState()
+
+            val uiState: RegisterUiState = when {
+                busy -> RegisterUiState.Loading
+                !busy && success && message != null -> RegisterUiState.Success(message!!)
+                !busy && !success && message != null -> RegisterUiState.Error(message!!)
+                else -> RegisterUiState.Idle
+            }
+
+            var firstName = ""
+            var lastName = ""
+            var username = ""
+            var password = ""
+            var retypePassword = ""
+            var email = ""
+
+            RegisterScreen(
+                uiState = uiState,
+                firstName = firstName,
+                onFirstNameChange = { firstName = it },
+                lastName = lastName,
+                onLastNameChange = { lastName = it },
+                username = username,
+                onUsernameChange = { username = it },
+                password = password,
+                onPasswordChange = { password = it },
+                retypePassword = retypePassword,
+                onRetypePasswordChange = { retypePassword = it },
+                email = email,
+                onEmailChange = { email = it },
+                onBack = {finish()},
+                onSubmit =  {
+                    viewModel.register(firstName, lastName, username, password, email)
+                }
             )
         }
     }

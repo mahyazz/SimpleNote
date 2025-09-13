@@ -1,5 +1,6 @@
 package com.example.simplenote.ui.auth.register
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.simplenote.ui.components.*
 import com.example.simplenote.ui.theme.*
+import com.example.simplenote.ui.auth.register.RegisterActivity.RegisterUiState
+import com.example.simplenote.ui.auth.login.LoginActivity
 
 @Composable
 fun RegisterScreen(
@@ -38,6 +41,25 @@ fun RegisterScreen(
     onSubmit: () -> Unit
 ) {
     val context = LocalContext.current
+
+    fun handleSignup() {
+        if (password != retypePassword) {
+            Toast.makeText(context, "Passwords do not match.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}\$")
+        if (!passwordRegex.matches(password)) {
+            Toast.makeText(
+                context,
+                "Password must be at least 8 characters, with uppercase, lowercase, and a number.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        onSubmit()
+    }
 
     Column(
         modifier = Modifier
@@ -140,15 +162,16 @@ fun RegisterScreen(
                 }
                 is RegisterUiState.Success -> {
                     LaunchedEffect(uiState) {
-//                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
-                        onBack()
+                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                        val intent = Intent(context, LoginActivity::class.java)
+                        context.startActivity(intent)
                     }
                 }
                 RegisterUiState.Idle -> {
                     AppButton(
                         text = "Register",
                         padding = 12.dp,
-                        onClick = onSubmit,
+                        onClick = {handleSignup()},
                         hasIcon = true
                     )
                 }
@@ -156,8 +179,8 @@ fun RegisterScreen(
 
             TextButton(
                 onClick = {
-//                    val intent = Intent(context, LoginActivity::class.java)
-//                    context.startActivity(intent)
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context.startActivity(intent)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
