@@ -29,157 +29,33 @@ import androidx.compose.runtime.setValue
 import com.example.simplenote.ui.settings.changepassword.*
 import com.example.simplenote.R
 
+@dagger.hilt.android.AndroidEntryPoint
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SettingsScreen(
-                name = "Taha Hamifar",
-                email = "hamifar.taha@gmail.com",
-                onBack = { /* Navigate back */ },
-                onChangePassword = {
-                    val intent = Intent(this, ChangePasswordActivity::class.java)
-                    startActivity(intent)
-                },
-                onLogout = { /* Handle logout */ }
-            )
-        }
-    }
-}
-
-@Composable
-fun SettingsScreen(
-    name: String,
-    email: String,
-    onBack: () -> Unit,
-    onChangePassword: () -> Unit,
-    onLogout: () -> Unit
-) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        TopBar("Settings", onBack= onBack)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ){
-            ProfileSection(
-            imageRes = AppIcons.Profile,
-            name = name,
-            email = email
-            )
-            HorizontalDivider(thickness = 1.dp, color = LightGray)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ){
-                Text(
-                    text = "APP SETTINGS",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight(400),
-                    color = DarkGray
+            MaterialTheme {
+                val vm: SettingsViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+                SettingsScreen(
+                    name = vm.name,
+                    email = vm.email,
+                    onBack = { finish() },
+                    onChangePassword = {
+                        val intent = Intent(this, ChangePasswordActivity::class.java)
+                        startActivity(intent)
+                    },
+                    onLogout = {
+                        vm.logout(
+                            onSuccess = {
+                                startActivity(Intent(this, com.example.simplenote.ui.auth.OnboardingActivity::class.java)
+                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK))
+                                finish()
+                            },
+                            onError = { }
+                        )
+                    }
                 )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .padding(start = 8.dp, end = 8.dp)
-                        .align(Alignment.Start),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AppLabel(
-                    "Change Password",
-                    AppIcons.Lock,
-                    16.sp,
-                    FontWeight(500),
-                    24.dp,
-                    onChangePassword
-                    )
-                }
-                HorizontalDivider(thickness = 1.dp, color = LightGray)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .padding(start = 8.dp, end = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AppLabel(
-                        "Log Out",
-                        AppIcons.Logout,
-                        16.sp,
-                        FontWeight(500),
-                        24.dp,
-                        { showDialog = true },
-                        Red
-                    )
-                }
             }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = "Taha Notes v1.1",
-            fontSize = 12.sp,
-            color = Gray,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp)
-        )
     }
-
-    if (showDialog) {
-        ActionPopup(
-            title = "Log Out",
-            message = "Are you sure you want to log out from the application?",
-            onConfirm = {
-                onLogout()
-                showDialog = false
-            },
-            onCancel = { showDialog = false },
-            onDismiss = { showDialog = false }
-        )
-    }
-}
-
-@Composable
-fun ProfileSection(imageRes: Int, name: String, email: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = "Profile",
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(text = name, fontSize = 20.sp, fontWeight = FontWeight(700))
-            AppLabel(email, AppIcons.Email, 12.sp, FontWeight(400), 15.dp, null, DarkGray)
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingsScreenPreview() {
-    SettingsScreen(
-        name = "Taha Hamifar",
-        email = "hamifar.taha@gmail.com",
-        onBack = {},
-        onChangePassword = {},
-        onLogout = {}
-    )
 }

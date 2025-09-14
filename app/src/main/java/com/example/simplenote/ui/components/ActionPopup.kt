@@ -28,12 +28,12 @@ fun ActionPopup(
             color = Color.White,
             modifier = Modifier
                 .width(280.dp)
-                .wrapContentHeight()
+                .height(320.dp)
         ) {
             Column(
                 modifier = Modifier
                     .padding(vertical = 24.dp, horizontal = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(48.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -56,17 +56,14 @@ fun ActionPopup(
                     )
                 }
 
+                Spacer(modifier = Modifier.width(12.dp))
+
+                 Row(
+                    modifier = Modifier.weight(1f)
+                ) {AppButton("Yes", 2.dp, onConfirm, false) }
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.weight(1f)
-                    ) { AppButton("Cancel", 2.dp, onCancel, false, "Outlined") }
-                     Row(
-                        modifier = Modifier.weight(1f)
-                    ) {AppButton("Yes", 2.dp, onConfirm, false) }
-                }
+                    modifier = Modifier.weight(1f)
+                ) { AppButton("Cancel", 2.dp, onCancel, false, "Outlined") }
             }
         }
     }

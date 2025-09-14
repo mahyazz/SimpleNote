@@ -9,7 +9,7 @@ data class RefreshResult(
     val pulled: Int,
     val pages: Int,
     val ok: Boolean,
-    val message: String? = null   // ← پیام تشخیصی (کد HTTP و …)
+    val message: String? = null
 )
 
 data class SyncResult(
@@ -50,5 +50,6 @@ interface NoteRepository {
     suspend fun bulkCreateLocal(items: List<NoteInput>): List<Note>
     fun pagedNotesFiltered(filter: com.example.simplenote.domain.model.NoteFilter, pageSize: Int = 20): kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<com.example.simplenote.domain.model.Note>>
 
-
+    // Clears all locally cached notes and paging keys (used on logout)
+    suspend fun clearLocalData()
 }

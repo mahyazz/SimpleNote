@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import com.example.simplenote.domain.model.*
-import com.example.simplenote.ui.notes.add.AddNoteActivity
+import com.example.simplenote.ui.notes.editor.NoteEditorActivity
 import kotlin.jvm.java
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.compose.runtime.LaunchedEffect
@@ -88,6 +88,8 @@ fun NotesRoute(
     var showFromPicker by remember { mutableStateOf(false) }
     var showToPicker   by remember { mutableStateOf(false) }
 
+    val busy by vm.busy.collectAsState()
+
     val dateFmt = remember {
         DateTimeFormatter.ofPattern("yyyy-MM-dd")
     }
@@ -96,6 +98,8 @@ fun NotesRoute(
 
 
     LaunchedEffect(currentFilter) { notes.refresh() }
+
+    val isLoading = busy || (notes.loadState.refresh is LoadState.Loading)
 
     Scaffold(
         bottomBar = {
@@ -106,7 +110,7 @@ fun NotesRoute(
                         .padding(16.dp),
                     containerColor = Color.White,
                     actions = {
-                        IconButton(onClick = { /* Home: could navigate to root; currently no-op */ }) {
+                        IconButton(onClick = {  }) {
                             Icon(painter = painterResource(AppIcons.Home),
                                 contentDescription = "Home",
                                 tint = Purple,
@@ -119,7 +123,7 @@ fun NotesRoute(
                                 .background(Purple, CircleShape)
                                 .combinedClickable(
                                     onClick = {
-                                        ctx.startActivity(Intent(ctx, AddNoteActivity::class.java))
+                                        ctx.startActivity(Intent(ctx, NoteEditorActivity::class.java))
                                     },
                                     onLongClick = {
                                         val items = listOf(
@@ -151,12 +155,16 @@ fun NotesRoute(
         }
     ) { padding ->
         key(currentFilter){
-            Column(
+            androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .background(LightPurple)
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -207,7 +215,7 @@ fun NotesRoute(
 
                 val isEmpty = notes.itemCount == 0 && notes.loadState.refresh is LoadState.NotLoading
 
-                if (isEmpty) {
+                if (isEmpty && currentFilter?.isEmpty() != false) {
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -256,14 +264,6 @@ fun NotesRoute(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Refresh state (full span)
-//                        item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-//                            when (val s = notes.loadState.refresh) {
-//                                is LoadState.Loading -> LoadingRow(text = "Loading...")
-//                                is LoadState.Error -> ErrorRow(text = s.error.message ?: "Error")
-//                                else -> {}
-//                            }
-//                        }
 
                         items(
                             count = notes.itemCount,
@@ -276,7 +276,7 @@ fun NotesRoute(
                                         .fillMaxWidth()
                                         .height(140.dp)
                                         .clickable {
-                                            val intent = Intent(ctx, com.example.simplenote.ui.notes.detail.NoteDetailActivity::class.java).apply {
+                                            val intent = Intent(ctx, NoteEditorActivity::class.java).apply {
                                                 putExtra("localId", note.id)
                                                 note.remoteId?.let { putExtra("remoteId", it) }
                                             }
@@ -306,15 +306,12 @@ fun NotesRoute(
                             }
                         }
 
-                        // Append state (full span)
-//                        item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-//                            when (val s = notes.loadState.append) {
-//                                is LoadState.Loading -> LoadingRow(text = "Loading more...")
-//                                is LoadState.Error -> ErrorRow(text = s.error.message ?: "Error")
-//                                else -> {}
-//                            }
-//                        }
                     }
+                }
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                    )
                 }
             }
         }
@@ -516,25 +513,8 @@ fun NotesRoute(
 
 }
 
-//@Composable
-//fun LoadingRow(text: String) {
-//    androidx.compose.foundation.layout.Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(12.dp)
-//    ) { Text(text) }
-//}
 
-//@Composable
-//fun ErrorRow(text: String) {
-//    androidx.compose.foundation.layout.Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(12.dp)
-//    ) { Text(text, color = MaterialTheme.colorScheme.error) }
-//}
 
-// --- Previews ---
 class FakeNotesViewModel : NotesViewModel() {
     override val filter: kotlinx.coroutines.flow.StateFlow<NoteFilter?> = kotlinx.coroutines.flow.MutableStateFlow(null)
 
@@ -588,5 +568,5 @@ fun PreviewNotesRouteEmpty() {
             vm = EmptyNotesViewModel()
         )
     }
-}
+}}
 

@@ -20,12 +20,55 @@ class AuthRepositoryImpl @Inject constructor(
         private const val KEY_ACCESS  = "access_token"
         private const val KEY_REFRESH = "refresh_token"
         private const val KEY_SCHEME  = "auth_scheme"
+        private const val KEY_USER_ID = "user_id"
+        private const val KEY_USER_USERNAME = "user_username"
+        private const val KEY_USER_EMAIL = "user_email"
+        private const val KEY_USER_FIRST = "user_first_name"
+        private const val KEY_USER_LAST = "user_last_name"
     }
 
     private fun saveTokens(access: String, refresh: String?, scheme: String) {
         prefs.edit().putString(KEY_ACCESS, access).apply()
         if (refresh != null) prefs.edit().putString(KEY_REFRESH, refresh).apply()
         prefs.edit().putString(KEY_SCHEME, scheme).apply()
+    }
+
+    private fun clearTokens(clearScheme: Boolean = true) {
+        prefs.edit()
+            .remove(KEY_ACCESS)
+            .remove(KEY_REFRESH)
+            .apply()
+        if (clearScheme) prefs.edit().remove(KEY_SCHEME).apply()
+    }
+
+    private fun saveUser(u: UserInfoDto) {
+        prefs.edit()
+            .putInt(KEY_USER_ID, u.id)
+            .putString(KEY_USER_USERNAME, u.username)
+            .putString(KEY_USER_EMAIL, u.email)
+            .putString(KEY_USER_FIRST, u.firstName)
+            .putString(KEY_USER_LAST, u.lastName)
+            .apply()
+    }
+
+    private fun clearUser() {
+        prefs.edit()
+            .remove(KEY_USER_ID)
+            .remove(KEY_USER_USERNAME)
+            .remove(KEY_USER_EMAIL)
+            .remove(KEY_USER_FIRST)
+            .remove(KEY_USER_LAST)
+            .apply()
+    }
+
+    private fun loadUser(): UserInfoDto? {
+        val id = prefs.getInt(KEY_USER_ID, -1)
+        if (id <= 0) return null
+        val username = prefs.getString(KEY_USER_USERNAME, null) ?: return null
+        val email = prefs.getString(KEY_USER_EMAIL, "") ?: ""
+        val first = prefs.getString(KEY_USER_FIRST, null)
+        val last = prefs.getString(KEY_USER_LAST, null)
+        return UserInfoDto(id = id, username = username, email = email, firstName = first, lastName = last)
     }
 
     private fun httpErrorMessage(e: HttpException): String {
@@ -50,10 +93,17 @@ class AuthRepositoryImpl @Inject constructor(
         try {
             val r = api.createToken(TokenRequest(username, password))
             saveTokens(r.access, r.refresh, scheme)
+            // Try to fetch user info immediately and cache it
+            runCatching { api.userInfo() }
+                .onSuccess { saveUser(it) }
             AuthResult.Success("Login successful")
         } catch (e: HttpException) {
+            // Ensure no stale tokens remain on failed login
+            clearTokens()
             AuthResult.Error(httpErrorMessage(e))
         } catch (t: Throwable) {
+            // Network or parsing error; also clear tokens to avoid inconsistent state
+            clearTokens()
             AuthResult.Error(t.localizedMessage ?: "Login failed")
         }
 
@@ -91,7 +141,8 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override fun logout() {
-        prefs.edit().remove(KEY_ACCESS).remove(KEY_REFRESH).apply()
+        clearTokens(clearScheme = true)
+        clearUser()
     }
 
     override fun isLoggedIn(): Boolean = !accessToken().isNullOrBlank()
@@ -99,7 +150,9 @@ class AuthRepositoryImpl @Inject constructor(
     override fun setScheme(s: String) { prefs.edit().putString(KEY_SCHEME, s).apply() }
     override fun accessToken(): String? = prefs.getString(KEY_ACCESS, null)
     override fun refreshToken(): String? = prefs.getString(KEY_REFRESH, null)
-    override suspend fun userInfo() = runCatching { api.userInfo() }
+    override suspend fun userInfo(): Result<UserInfoDto> = runCatching { api.userInfo() }
+        .onSuccess { saveUser(it) }
+    override fun cachedUser(): UserInfoDto? = loadUser()
     override suspend fun changePassword(old: String, new: String): AuthResult =
         try {
             api.changePassword(ChangePasswordRequest(old, new))

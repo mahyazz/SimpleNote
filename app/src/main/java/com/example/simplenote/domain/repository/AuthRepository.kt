@@ -18,5 +18,6 @@ interface AuthRepository {
     fun accessToken(): String?
     fun refreshToken(): String?
     suspend fun userInfo(): Result<UserInfoDto>
+    fun cachedUser(): UserInfoDto?
     suspend fun changePassword(old: String, new: String): AuthResult
 }

@@ -17,6 +17,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
 import com.example.simplenote.data.local.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -359,5 +360,11 @@ class NoteRepositoryImpl @Inject constructor(
             pagingSourceFactory = { noteDao.pagingSourceFiltered(filter.title, filter.description, filter.updatedGteMillis, filter.updatedLteMillis) }
         ).flow.map { it.map { e -> e.toDomain() } }
 
-
+    override suspend fun clearLocalData() {
+        // Clear all local notes and paging keys atomically
+        db.withTransaction {
+            db.noteRemoteKeysDao().clear()
+            db.noteDao().clearAll()
+        }
+    }
 }

@@ -41,7 +41,7 @@ fun AppButton (
             fontSize = 16.sp,
             fontWeight = FontWeight(500),
             color = contentColor,
-            modifier = Modifier.padding(padding)
+//            modifier = Modifier.padding(padding)
         )
         Spacer(modifier = Modifier.weight(1f))
         if (hasIcon) {
@@ -57,7 +57,8 @@ fun AppButton (
     if (type == "Outlined") {
         OutlinedButton(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                   .padding(padding),
             shape = RoundedCornerShape(100.dp),
             border = border,
             colors = buttonColors,
@@ -66,7 +67,8 @@ fun AppButton (
     } else {
         Button(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(padding),
             shape = RoundedCornerShape(100.dp),
             colors = buttonColors,
             content = content

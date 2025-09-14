@@ -42,6 +42,17 @@ class LoginActivity : ComponentActivity() {
             var username by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
 
+            var navigated by remember { mutableStateOf(false) }
+
+            // Navigate only after successful login
+            if (uiState is LoginUiState.Success && !navigated) {
+                navigated = true
+                val intent = Intent(this, NotesActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                this.startActivity(intent)
+                finish()
+            }
+
             LoginScreen(
                 uiState = uiState,
                 username = username,
@@ -50,8 +61,6 @@ class LoginActivity : ComponentActivity() {
                 onPasswordChange = { password = it },
                 onSubmit = {
                     viewModel.login(username, password)
-                    val intent = Intent(this, NotesActivity::class.java)
-                    this.startActivity(intent)
                 }
             )
         }

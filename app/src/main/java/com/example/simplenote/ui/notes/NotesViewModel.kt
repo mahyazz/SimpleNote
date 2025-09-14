@@ -97,7 +97,6 @@ open class NotesViewModel @Inject constructor(
 
     fun consumeMessage() { snackbarMessage.value = null }
 
-    /* ---------- Token/Scheme مدیریت ---------- */
     fun tokenStatus(): String {
         val t = prefs.getString(TOKEN_KEY, null)
         val s = prefs.getString(SCHEME_KEY, "JWT")
@@ -117,7 +116,6 @@ open class NotesViewModel @Inject constructor(
         snackbarMessage.value = "Scheme set to $scheme. ${tokenStatus()}"
     }
 
-    /* ---------- CRUD / Sync ---------- */
     fun add(title: String, desc: String) = viewModelScope.launch {
         try {
             isBusy.value = true
@@ -177,7 +175,6 @@ open class NotesViewModel @Inject constructor(
         } finally { isBusy.value = false }
     }
 
-    /* ---------- Raw Connectivity Test (بدون Retrofit/OkHttp) ---------- */
     fun debugNetwork() = viewModelScope.launch {
         try {
             isBusy.value = true

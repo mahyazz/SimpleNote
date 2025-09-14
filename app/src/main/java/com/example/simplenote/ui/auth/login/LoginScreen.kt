@@ -93,7 +93,7 @@ fun LoginScreen(
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     }
                     AppButton(
-                        text = "Register",
+                        text = "Login",
                         padding = 12.dp,
                         onClick = onSubmit,
                         hasIcon = true
