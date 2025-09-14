@@ -15,7 +15,7 @@ object AppIcons {
     val Email = R.drawable.ic_email
 
     @DrawableRes
-    val Profile = R.drawable.ic_pfp
+    val Profile = R.drawable.ic_pfp_damaged
 
     @DrawableRes
     val ArrowRight = R.drawable.ic_arrow_right
@@ -31,4 +31,16 @@ object AppIcons {
 
     @DrawableRes
     val Invisible = R.drawable.ic_visibility_off
+
+    @DrawableRes
+    val Home = R.drawable.ic_home
+
+    @DrawableRes
+    val Add = R.drawable.ic_add
+
+    @DrawableRes
+    val Settings = R.drawable.ic_settings
+
+    @DrawableRes
+    val Delete = R.drawable.ic_delete
 }

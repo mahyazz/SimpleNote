@@ -1,47 +1,53 @@
 package com.example.simplenote.ui.auth.register
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.simplenote.domain.usecase.RegisterUseCase
+import com.example.simplenote.domain.repository.AuthRepository
+import com.example.simplenote.domain.repository.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase
+    private val authRepo: AuthRepository
 ) : ViewModel() {
 
-    var uiState by mutableStateOf<RegisterUiState>(RegisterUiState.Idle)
-        private set
+    private val _busy = MutableStateFlow(false)
+    val busy: StateFlow<Boolean> = _busy.asStateFlow()
 
-    var firstName by mutableStateOf("")
-    var lastName by mutableStateOf("")
-    var username by mutableStateOf("")
-    var email by mutableStateOf("")
-    var password by mutableStateOf("")
-    var confirm by mutableStateOf("")
+    private val _message = MutableStateFlow<String?>(null)
+    val message: StateFlow<String?> = _message.asStateFlow()
 
-    fun register() {
-        viewModelScope.launch {
-            uiState = RegisterUiState.Loading
-            try {
-                val response = registerUseCase(
-                    firstName, lastName, username, email, password, confirm
-                )
-                if (response.isSuccessful) {
-                    uiState = RegisterUiState.Success(username)
-                } else {
-                    uiState = RegisterUiState.Error("خطا: ${response.code()}")
-                }
-            } catch (e: IllegalArgumentException) {
-                uiState = RegisterUiState.Error(e.message ?: "ورودی نامعتبر")
-            } catch (e: Exception) {
-                uiState = RegisterUiState.Error(e.message ?: "خطا در ارتباط با سرور")
-            }
-        }
+    private val _success = MutableStateFlow(false)
+    val success: StateFlow<Boolean> = _success.asStateFlow()
+
+    private val _scheme = MutableStateFlow(authRepo.currentScheme())
+    val scheme: StateFlow<String> = _scheme.asStateFlow()
+
+    fun updateScheme(s: String) {
+        _scheme.value = s
+        authRepo.setScheme(s)
     }
+
+    fun register(username: String, password: String, email: String, firstName: String?, lastName: String?) =
+        viewModelScope.launch {
+            _busy.value = true
+            _message.value = "Registering..."
+            when (val res = authRepo.register(username, password, email, firstName, lastName, _scheme.value)) {
+                is AuthResult.Success -> {
+                    _message.value = res.message ?: "Registration successfull. Please login."
+                    _success.value = true
+                }
+                is AuthResult.Error -> {
+                    _message.value = res.message
+                    _success.value = false
+                }
+            }
+            _busy.value = false
+        }
+
 }

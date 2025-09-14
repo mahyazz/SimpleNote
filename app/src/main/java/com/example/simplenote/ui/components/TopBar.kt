@@ -16,7 +16,8 @@ import androidx.compose.ui.Alignment
 fun TopBar(
     title: String? = null,
     backButtonText: String = "Back",
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    actions: (@Composable () -> Unit)? = null
 ) {
     Box(
         modifier = Modifier
@@ -40,6 +41,17 @@ fun TopBar(
                 color = Color.Black,
                 modifier = Modifier.align(Alignment.Center)
             )
+        }
+
+        if (actions != null) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                actions()
+            }
         }
     }
     HorizontalDivider(thickness = 1.dp, color = LightGray)

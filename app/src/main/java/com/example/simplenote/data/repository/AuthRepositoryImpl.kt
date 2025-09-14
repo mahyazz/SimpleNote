@@ -1,60 +1,165 @@
 package com.example.simplenote.data.repository
 
 import androidx.security.crypto.EncryptedSharedPreferences
-import com.example.simplenote.domain.model.Result
+import com.example.simplenote.data.api.AuthApi
+import com.example.simplenote.data.api.model.*
 import com.example.simplenote.domain.repository.AuthRepository
-import com.example.simplenote.data.api.model.ChangePasswordRequest
-
+import com.example.simplenote.domain.repository.AuthResult
+import org.json.JSONObject
+import retrofit2.HttpException
 import javax.inject.Inject
-import java.io.IOException
-import com.example.simplenote.data.api.model.RegisterRequest
-import com.example.simplenote.data.api.model.RegisterResponse
-import retrofit2.Response
-import com.example.simplenote.data.api.ApiService
+import javax.inject.Singleton
 
-
+@Singleton
 class AuthRepositoryImpl @Inject constructor(
-    private val apiService: ApiService,
-    private val encryptedPrefs: EncryptedSharedPreferences
+    private val api: AuthApi,
+    private val prefs: EncryptedSharedPreferences
 ) : AuthRepository {
 
-    override suspend fun changePassword(
-        oldPassword: String,
-        newPassword: String
-    ): Result<Unit> {
+    companion object {
+        private const val KEY_ACCESS  = "access_token"
+        private const val KEY_REFRESH = "refresh_token"
+        private const val KEY_SCHEME  = "auth_scheme"
+        private const val KEY_USER_ID = "user_id"
+        private const val KEY_USER_USERNAME = "user_username"
+        private const val KEY_USER_EMAIL = "user_email"
+        private const val KEY_USER_FIRST = "user_first_name"
+        private const val KEY_USER_LAST = "user_last_name"
+    }
+
+    private fun saveTokens(access: String, refresh: String?, scheme: String) {
+        prefs.edit().putString(KEY_ACCESS, access).apply()
+        if (refresh != null) prefs.edit().putString(KEY_REFRESH, refresh).apply()
+        prefs.edit().putString(KEY_SCHEME, scheme).apply()
+    }
+
+    private fun clearTokens(clearScheme: Boolean = true) {
+        prefs.edit()
+            .remove(KEY_ACCESS)
+            .remove(KEY_REFRESH)
+            .apply()
+        if (clearScheme) prefs.edit().remove(KEY_SCHEME).apply()
+    }
+
+    private fun saveUser(u: UserInfoDto) {
+        prefs.edit()
+            .putInt(KEY_USER_ID, u.id)
+            .putString(KEY_USER_USERNAME, u.username)
+            .putString(KEY_USER_EMAIL, u.email)
+            .putString(KEY_USER_FIRST, u.firstName)
+            .putString(KEY_USER_LAST, u.lastName)
+            .apply()
+    }
+
+    private fun clearUser() {
+        prefs.edit()
+            .remove(KEY_USER_ID)
+            .remove(KEY_USER_USERNAME)
+            .remove(KEY_USER_EMAIL)
+            .remove(KEY_USER_FIRST)
+            .remove(KEY_USER_LAST)
+            .apply()
+    }
+
+    private fun loadUser(): UserInfoDto? {
+        val id = prefs.getInt(KEY_USER_ID, -1)
+        if (id <= 0) return null
+        val username = prefs.getString(KEY_USER_USERNAME, null) ?: return null
+        val email = prefs.getString(KEY_USER_EMAIL, "") ?: ""
+        val first = prefs.getString(KEY_USER_FIRST, null)
+        val last = prefs.getString(KEY_USER_LAST, null)
+        return UserInfoDto(id = id, username = username, email = email, firstName = first, lastName = last)
+    }
+
+    private fun httpErrorMessage(e: HttpException): String {
+        val raw = e.response()?.errorBody()?.string().orEmpty()
+        val msg = try {
+            if (raw.isNotBlank()) {
+                val jo = JSONObject(raw)
+                when {
+                    jo.has("detail") -> jo.optString("detail")
+                    jo.has("non_field_errors") -> jo.optJSONArray("non_field_errors")?.optString(0)
+                    jo.has("username") -> jo.optJSONArray("username")?.optString(0)
+                    jo.has("password") -> jo.optJSONArray("password")?.optString(0)
+                    jo.has("email")    -> jo.optJSONArray("email")?.optString(0)
+                    else -> raw
+                }
+            } else e.message()
+        } catch (_: Throwable) { if (raw.isNotBlank()) raw else e.message() }
+        return "HTTP ${e.code()}: ${msg ?: "Server error"}"
+    }
+
+    override suspend fun login(username: String, password: String, scheme: String): AuthResult =
+        try {
+            val r = api.createToken(TokenRequest(username, password))
+            saveTokens(r.access, r.refresh, scheme)
+            // Try to fetch user info immediately and cache it
+            runCatching { api.userInfo() }
+                .onSuccess { saveUser(it) }
+            AuthResult.Success("Login successful")
+        } catch (e: HttpException) {
+            // Ensure no stale tokens remain on failed login
+            clearTokens()
+            AuthResult.Error(httpErrorMessage(e))
+        } catch (t: Throwable) {
+            // Network or parsing error; also clear tokens to avoid inconsistent state
+            clearTokens()
+            AuthResult.Error(t.localizedMessage ?: "Login failed")
+        }
+
+    override suspend fun register(
+        username: String,
+        password: String,
+        email: String,
+        firstName: String?,
+        lastName: String?,
+        scheme: String // Ignored for now; we do not auto-login after registration
+    ): AuthResult {
         return try {
-            val response = apiService.changePassword(ChangePasswordRequest(oldPassword, newPassword))
-
-            android.util.Log.d("AuthRepository", "HTTP ${response.code()}: ${response.body()} / ${response.errorBody()?.string()}")
-
-            when {
-                response.isSuccessful -> {
-                    Result(success = true, message = "Password changed successfully.")
-                }
-                response.code() == 401 -> {
-                    Result(success = false, message = "Your current password is incorrect.")
-                }
-                response.code() == 500 -> {
-                    Result(success = false, message = "A server error occurred.")
-                }
-                else -> {
-                    Result(success = false, message = "An unexpected error occurred.")
-                }
-            }
-
-        } catch (e: IOException) {
-            Result(success = false, message = "Network error: Check your connection")
-        } catch (e: Exception) {
-            Result(success = false, message = "An unexpected error occurred.")
+            api.register(RegisterRequest(username, password, email, firstName, lastName))
+            // Note: Auto-login and saveTokens removed
+            AuthResult.Success("Registration successful. Please log in.")
+        } catch (e: HttpException) {
+            AuthResult.Error(httpErrorMessage(e))
+        } catch (t: Throwable) {
+            AuthResult.Error(t.localizedMessage ?: "Register failed")
         }
     }
 
-    override suspend fun logout() {
-        encryptedPrefs.edit().remove("token_key").apply()
-    }
-    override suspend fun register(request: RegisterRequest): Response<RegisterResponse> {
-        return apiService.register(request)
+
+    override suspend fun refresh(): AuthResult {
+        val refresh = prefs.getString(KEY_REFRESH, null) ?: return AuthResult.Error("No refresh token")
+        return try {
+            val r = api.refreshToken(RefreshRequest(refresh))
+            saveTokens(r.access, null, currentScheme())
+            AuthResult.Success("Access refreshed")
+        } catch (e: HttpException) {
+            AuthResult.Error(httpErrorMessage(e))
+        } catch (t: Throwable) {
+            AuthResult.Error(t.localizedMessage ?: "Refresh failed")
+        }
     }
 
+    override fun logout() {
+        clearTokens(clearScheme = true)
+        clearUser()
+    }
 
+    override fun isLoggedIn(): Boolean = !accessToken().isNullOrBlank()
+    override fun currentScheme(): String = prefs.getString(KEY_SCHEME, "Bearer") ?: "Bearer"
+    override fun setScheme(s: String) { prefs.edit().putString(KEY_SCHEME, s).apply() }
+    override fun accessToken(): String? = prefs.getString(KEY_ACCESS, null)
+    override fun refreshToken(): String? = prefs.getString(KEY_REFRESH, null)
+    override suspend fun userInfo(): Result<UserInfoDto> = runCatching { api.userInfo() }
+        .onSuccess { saveUser(it) }
+    override fun cachedUser(): UserInfoDto? = loadUser()
+    override suspend fun changePassword(old: String, new: String): AuthResult =
+        try {
+            api.changePassword(ChangePasswordRequest(old, new))
+            AuthResult.Success("Password changed")
+        } catch (e: HttpException) {
+            AuthResult.Error(httpErrorMessage(e))
+        } catch (t: Throwable) {
+            AuthResult.Error(t.localizedMessage ?: "Change password failed")
+        }
 }

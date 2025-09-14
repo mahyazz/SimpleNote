@@ -24,11 +24,12 @@ fun AppButton (
     hasIcon: Boolean,
     type: String = "Filled",
 ) {
-    val buttonColors = if (type == "Filled") {
-        ButtonDefaults.buttonColors(containerColor = Purple)
-    } else {
-        ButtonDefaults.outlinedButtonColors()
+    val buttonColors = when (type) {
+        "Alt" -> ButtonDefaults.buttonColors(containerColor = Color.White)
+        "Outlined" -> ButtonDefaults.outlinedButtonColors()
+        else -> ButtonDefaults.buttonColors(containerColor = Purple)
     }
+
     val border = if (type == "Outlined") BorderStroke(2.dp, Purple) else null
     val contentColor = if (type == "Filled") Color.White else Purple
 
@@ -40,7 +41,7 @@ fun AppButton (
             fontSize = 16.sp,
             fontWeight = FontWeight(500),
             color = contentColor,
-            modifier = Modifier.padding(padding)
+//            modifier = Modifier.padding(padding)
         )
         Spacer(modifier = Modifier.weight(1f))
         if (hasIcon) {
@@ -56,7 +57,8 @@ fun AppButton (
     if (type == "Outlined") {
         OutlinedButton(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                   .padding(padding),
             shape = RoundedCornerShape(100.dp),
             border = border,
             colors = buttonColors,
@@ -65,7 +67,8 @@ fun AppButton (
     } else {
         Button(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(padding),
             shape = RoundedCornerShape(100.dp),
             colors = buttonColors,
             content = content

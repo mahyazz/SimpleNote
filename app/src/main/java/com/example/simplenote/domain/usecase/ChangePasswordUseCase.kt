@@ -3,6 +3,7 @@ package com.example.simplenote.domain.usecase
 import com.example.simplenote.core.validation.PasswordValidator
 import com.example.simplenote.domain.model.Result
 import com.example.simplenote.domain.repository.AuthRepository
+import com.example.simplenote.domain.repository.AuthResult
 import javax.inject.Inject
 
 class ChangePasswordUseCase @Inject constructor(
@@ -13,19 +14,19 @@ class ChangePasswordUseCase @Inject constructor(
         oldPassword: String,
         newPassword: String,
         confirm: String
-    ): Result<Unit> {
-        // 1) اعتبارسنجی ورودی‌ها (در صورت مشکل، Exception پرتاب کن)
+    ): AuthResult {
+        // 1) Validate inputs (throw Exception on issues)
         if (oldPassword.isBlank() || newPassword.isBlank() || confirm.isBlank())
-            throw IllegalArgumentException("تمام فیلدها باید پر شوند")
+            throw IllegalArgumentException("All fields are required")
 
         if (newPassword != confirm)
-            throw IllegalArgumentException("رمزها مطابقت ندارند")
+            throw IllegalArgumentException("Passwords do not match")
 
         val v = validator.requireStrong(newPassword)
         if (!v.success)
-            throw IllegalArgumentException(v.message ?: "رمز عبور ضعیف است")
+            throw IllegalArgumentException(v.message ?: "Weak password")
 
-        // 2) فقط نتیجه‌ی ریپو را برگردان (از نوع Result<Unit>)
+        // 2) Return the repository result (Result<Unit>)
         return repo.changePassword(oldPassword, newPassword)
     }
 }

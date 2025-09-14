@@ -1,40 +1,39 @@
 package com.example.simplenote.ui.settings
 
-import com.example.simplenote.ui.components.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextAlign
-import com.example.simplenote.ui.theme.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import com.example.simplenote.R
+import com.example.simplenote.ui.components.ActionPopup
+import com.example.simplenote.ui.components.AppIcons
+import com.example.simplenote.ui.components.AppLabel
+import com.example.simplenote.ui.components.TopBar
+import com.example.simplenote.ui.theme.DarkGray
+import com.example.simplenote.ui.theme.Gray
+import com.example.simplenote.ui.theme.LightGray
+import com.example.simplenote.ui.theme.Red
 
 @Composable
 fun SettingsScreen(
-    uiState: SettingsUiState,
     name: String,
     email: String,
     onBack: () -> Unit,
     onChangePassword: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -42,24 +41,23 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        TopBar("Settings", onBack= onBack)
+        TopBar("Settings", onBack = onBack)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
-        ){
+        ) {
             ProfileSection(
-                imageRes = AppIcons.Profile,
-                name = name,
-                email = email
+                imageRes = R.drawable.ic_pfp,
+                name = name.ifBlank { "-" },
+                email = email.ifBlank { "-" }
             )
             HorizontalDivider(thickness = 1.dp, color = LightGray)
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
-            ){
+            ) {
                 Text(
                     text = "APP SETTINGS",
                     fontSize = 10.sp,
@@ -133,8 +131,7 @@ fun SettingsScreen(
 @Composable
 fun ProfileSection(imageRes: Int, name: String, email: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -142,8 +139,8 @@ fun ProfileSection(imageRes: Int, name: String, email: String) {
             contentDescription = "Profile",
             modifier = Modifier
                 .size(64.dp)
-                .clip(CircleShape)
         )
+
         Spacer(modifier = Modifier.width(12.dp))
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(text = name, fontSize = 20.sp, fontWeight = FontWeight(700))
@@ -154,11 +151,10 @@ fun ProfileSection(imageRes: Int, name: String, email: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun SettingsScreenPreview() {
+private fun SettingsScreenPreview() {
     SettingsScreen(
-        uiState = SettingsUiState.Idle,
-        name = "Taha Hamifar",
-        email = "hamifar.taha@gmail.com",
+        name = "John Doe",
+        email = "john@example.com",
         onBack = {},
         onChangePassword = {},
         onLogout = {}

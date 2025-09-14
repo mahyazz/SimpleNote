@@ -1,6 +1,7 @@
 package com.example.simplenote.ui.settings.changepassword
 
 import android.widget.Toast
+import com.example.simplenote.ui.util.UserMessages
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -104,7 +105,8 @@ fun ChangePasswordScreen(
                 }
                 is ChangePasswordUiState.Error -> {
                     LaunchedEffect(uiState) {
-                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                        val msg = UserMessages.friendlyError(uiState.message)
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     }
                     AppButton(
                         text = "Submit New Password",
@@ -115,7 +117,8 @@ fun ChangePasswordScreen(
                 }
                 is ChangePasswordUiState.Success -> {
                     LaunchedEffect(uiState) {
-                        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
+                        val msg = UserMessages.friendlySuccess(uiState.message, fallback = "Password changed successfully.")
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                         onBack()
                     }
                 }
