@@ -59,6 +59,11 @@ fun RegisterScreen(
             return
         }
 
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(context, "Invalid email address.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         onSubmit()
     }
 
