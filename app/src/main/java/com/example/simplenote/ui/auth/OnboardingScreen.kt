@@ -39,7 +39,7 @@ fun OnboardingScreen(
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.onboarding2),
+                painter = painterResource(id = R.drawable.onboarding),
                 contentDescription = "Image",
                 modifier = Modifier.size(280.dp)
                     .align(Alignment.CenterHorizontally)

@@ -23,6 +23,7 @@
         <activity android:name=".ui.notes.add.AddNoteActivity" />
         <activity android:name=".ui.notes.detail.NoteDetailActivity" />
         <activity android:name=".ui.notes.edit.EditNoteActivity" />
+        <activity android:name=".ui.notes.NotesActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

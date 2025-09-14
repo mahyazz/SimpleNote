@@ -45,6 +45,9 @@ object AppModule {
     }
 
     @Provides @Singleton
+    fun provideSharedPreferences(prefs: EncryptedSharedPreferences): android.content.SharedPreferences = prefs
+
+    @Provides @Singleton
     fun provideOkHttp(prefs: EncryptedSharedPreferences): OkHttpClient {
         val authInterceptor = Interceptor { chain ->
             val token = prefs.getString(KEY_ACCESS, null)

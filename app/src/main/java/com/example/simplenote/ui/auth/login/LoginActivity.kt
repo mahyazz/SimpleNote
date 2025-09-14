@@ -1,5 +1,6 @@
 package com.example.simplenote.ui.auth.login
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.simplenote.ui.notes.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,6 +50,8 @@ class LoginActivity : ComponentActivity() {
                 onPasswordChange = { password = it },
                 onSubmit = {
                     viewModel.login(username, password)
+                    val intent = Intent(this, NotesActivity::class.java)
+                    this.startActivity(intent)
                 }
             )
         }

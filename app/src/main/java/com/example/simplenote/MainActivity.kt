@@ -32,8 +32,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 NotesRoute(
-                    onOpenSettings = { startActivity(Intent(this, SettingsActivity::class.java)) },
-                    onOpenRegister = { startActivity(Intent(this, RegisterActivity::class.java)) }
+                    onOpenSettings = { startActivity(Intent(this, SettingsActivity::class.java)) }
                 )
             }
         }
